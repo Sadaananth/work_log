@@ -7,3 +7,16 @@ edition = "2021"
 chrono = "0.4"
 clap = { version = "4.5.23", features = ["derive"] }
 duckdb = { version = "1.1.1", features = ["bundled"] }
+textplots = "0.8"
+
+[[bin]]
+name = "work_log"
+path = "src/main.rs"
+
+[[bin]]
+name = "example"
+path = "src/example.rs"
+
+[lib]
+name = "work_log"
+path = "src/lib/lib.rs"

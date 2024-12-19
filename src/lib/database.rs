@@ -1,6 +1,7 @@
 pub mod database {
-    use duckdb::{params, Connection};
+    use duckdb::{params, Connection, MappedRows};
     use chrono::{Utc, TimeZone};
+    use crate::common::common::Entry;
 
     pub struct DatabaseHandler {
         conn: Connection,
@@ -56,19 +57,13 @@ pub mod database {
         }
 
         pub fn print(&self) {
-            #[derive(Debug)]
-            struct WorkLog {
-                date: u64,
-                entry: u64,
-                exit: u64,
-            }
             let mut stmt = self
                 .conn
                 .prepare("SELECT date, entry, exit FROM worklog")
                 .expect("Failed to get data");
             let log_iter = stmt
                 .query_map([], |row| {
-                    Ok(WorkLog {
+                    Ok(Entry {
                         date: row.get(0)?,
                         entry: row.get(1)?,
                         exit: row.get(2)?,
