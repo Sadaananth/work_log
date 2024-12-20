@@ -8,6 +8,7 @@ chrono = "0.4"
 clap = { version = "4.5.23", features = ["derive"] }
 duckdb = { version = "1.1.1", features = ["bundled"] }
 textplots = "0.8"
+colour = "2.1.0"
 
 [[bin]]
 name = "work_log"

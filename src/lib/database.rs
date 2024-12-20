@@ -1,7 +1,8 @@
 pub mod database {
-    use duckdb::{params, Connection, MappedRows};
+    use duckdb::{params, Connection};
     use chrono::{Utc, TimeZone};
-    use crate::{common::common::Entry, worklog::WorkLog};
+    use crate::common::common::Entry;
+    use colour::*;
 
     pub struct DatabaseHandler {
         conn: Connection,
@@ -51,9 +52,10 @@ pub mod database {
             let entry_local = entry_utc.with_timezone(&chrono::Local);
             let exit_utc = Utc.timestamp_opt(exit.try_into().unwrap(), 0).unwrap();
             let exit_local = exit_utc.with_timezone(&chrono::Local);
-            println!("Date: {} Entry: {} Exit {}", midnight_local, entry_local, exit_local);
-            println!("Log:");
-            println!("No work logged for this day :)");
+            yellow_ln_bold!("{}", midnight_local);
+            println!("Entry: {}", entry_local);
+            println!("Exit: {}", exit_local);
+            println!("\n\tNo work logged for this day :)\n");
         }
 
         pub fn print(&self) {
