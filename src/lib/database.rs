@@ -1,7 +1,7 @@
 pub mod database {
     use duckdb::{params, Connection, MappedRows};
     use chrono::{Utc, TimeZone};
-    use crate::common::common::Entry;
+    use crate::{common::common::Entry, worklog::WorkLog};
 
     pub struct DatabaseHandler {
         conn: Connection,
@@ -75,6 +75,28 @@ pub mod database {
                 let value = log.unwrap();
                 self.pretty_print(value.date, value.entry, value.exit)
             }
+        }
+
+        pub fn get_entry(&self) -> Vec<Entry> {
+            let mut stmt = self
+                .conn
+                .prepare("SELECT date, entry, exit FROM worklog")
+                .expect("Failed to get data");
+            let log_iter = stmt
+                .query_map([], |row| {
+                    Ok(Entry {
+                        date: row.get(0)?,
+                        entry: row.get(1)?,
+                        exit: row.get(2)?,
+                    })
+                })
+                .expect("Query failed");
+
+            let mut data = Vec::new();
+            for row in log_iter {
+                data.push(row.unwrap());
+            }
+            data
         }
     }
 }

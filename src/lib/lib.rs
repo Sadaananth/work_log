@@ -1,12 +1,13 @@
 pub mod database;
 pub mod common;
+pub mod plot;
 
 pub mod worklog {
     use crate::database::database::DatabaseHandler;
     use std::time::{SystemTime, UNIX_EPOCH};
     
     pub struct WorkLog {
-        database_handler: DatabaseHandler
+        pub database_handler: DatabaseHandler
     }
 
     impl WorkLog {
