@@ -1,5 +1,5 @@
+use ::work_log::worklog::WorkLog;
 use clap::Parser;
-use::work_log::worklog::WorkLog;
 
 #[derive(Parser)]
 struct Cli {
@@ -7,7 +7,7 @@ struct Cli {
 }
 
 fn main() {
-    let work_log = WorkLog::new();
+    let work_log = WorkLog::new(false);
     let args = Cli::parse();
 
     match args.command {
@@ -16,7 +16,7 @@ fn main() {
             "entry" => work_log.add_entry(),
             "exit" => work_log.add_exit(),
             "show" => work_log.print(),
-            _ => work_log.print()
+            _ => work_log.print(),
         },
     }
 }

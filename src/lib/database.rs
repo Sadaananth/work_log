@@ -1,17 +1,21 @@
 pub mod database {
-    use duckdb::{params, Connection};
-    use chrono::{Utc, TimeZone};
     use crate::common::common::Entry;
+    use chrono::{TimeZone, Utc};
     use colour::*;
+    use duckdb::{params, Connection};
 
     pub struct DatabaseHandler {
         conn: Connection,
     }
 
     impl DatabaseHandler {
-        pub fn new() -> Self {
+        pub fn new(use_in_memory: bool) -> Self {
             DatabaseHandler {
-                conn: Connection::open("worklog.db").expect("Failed to open connection"),
+                conn: if use_in_memory {
+                    Connection::open_in_memory().expect("Failed to open connection to in memory database")
+                } else {
+                    Connection::open("worklog.db").expect("Failed to open connection to database")
+                },
             }
         }
         pub fn init_handler(&self) {
@@ -26,7 +30,7 @@ pub mod database {
                 )
                 .expect("Failed to create table");
         }
-        pub fn add_entry(&self, midnight:u64, time: u64) {
+        pub fn add_entry(&self, midnight: u64, time: u64) {
             self.conn
                 .execute(
                     "INSERT INTO worklog (date, entry, exit) VALUES (?, ?, ?)  ON CONFLICT DO UPDATE SET entry = EXCLUDED.entry;",
@@ -35,7 +39,7 @@ pub mod database {
                 .expect("Failed to insert worklog entry");
             println!("Added entry. Good luck on staring ur day fresh");
         }
-        pub fn add_exit(&self, midnight:u64, time: u64) {
+        pub fn add_exit(&self, midnight: u64, time: u64) {
             self.conn
                 .execute(
                     "INSERT INTO worklog (date, entry, exit) VALUES (?, ?, ?) ON CONFLICT DO UPDATE SET exit = EXCLUDED.exit;",
@@ -45,7 +49,7 @@ pub mod database {
             println!("Added exit. Enjoy your leave");
         }
 
-        pub fn pretty_print(&self, midnight:u64, entry: u64, exit: u64) {
+        pub fn pretty_print(&self, midnight: u64, entry: u64, exit: u64) {
             let midnight_utc = Utc.timestamp_opt(midnight.try_into().unwrap(), 0).unwrap();
             let midnight_local = midnight_utc.with_timezone(&chrono::Local);
             let entry_utc = Utc.timestamp_opt(entry.try_into().unwrap(), 0).unwrap();
