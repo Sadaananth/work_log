@@ -16,6 +16,7 @@ fn main() {
             "entry" => work_log.add_entry(),
             "exit" => work_log.add_exit(),
             "show" => work_log.print(),
+            "plot" => work_log.plot(),
             _ => work_log.print(),
         },
     }

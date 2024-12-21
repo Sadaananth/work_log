@@ -2,15 +2,15 @@ pub mod plot {
     use crate::common::common::Entry;
     use textplots::{Chart, Plot, Shape};
 
-    use chrono::{DateTime, Utc, TimeZone, Timelike};
+    use chrono::{DateTime, Local, TimeZone, Timelike};
 
     fn to_hour_and_minute(timestamp: u64) -> Option<(u32, u32)> {
-        let datetime: DateTime<Utc> = Utc.timestamp_millis_opt(timestamp as i64).single()?;
+        let datetime: DateTime<Local> = Local.timestamp_opt(timestamp as i64, 0u32).single()?;
         Some((datetime.hour(), datetime.minute()))
     }
 
     pub fn plot_entries(entries: Vec<Entry>) {
-        let mut increment = 0.0;
+        let mut increment = 0.0;    
         let entry_data: Vec<(f32, f32)> = entries
             .iter()
             .filter_map(|value| {
@@ -40,7 +40,9 @@ pub mod plot {
         }
         Chart::new(150, 40, 0.0, 5.0)
             .lineplot(&Shape::Steps(&entry_data))
-            .lineplot(&Shape::Steps(&exit_data))
             .display();
+        Chart::new(150, 40, 0.0, 5.0)
+        .lineplot(&Shape::Steps(&exit_data))
+        .display();
     }
 }

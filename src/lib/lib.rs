@@ -5,7 +5,7 @@ pub mod plot;
 pub mod worklog {
     use crate::database::database::DatabaseHandler;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use chrono::{DateTime, NaiveDateTime, Utc, TimeZone, ParseError};
+    use chrono::{DateTime, Local, ParseError};
 
     pub struct WorkLog {
         pub database_handler: DatabaseHandler,
@@ -29,6 +29,7 @@ pub mod worklog {
         fn get_midnight(&self, time: u64) -> u64 {
             let seconds_in_day = 24 * 60 * 60;
             let secs_from_midnight = time % seconds_in_day;
+            println!("time {}, secs_from_midnight {}", time, secs_from_midnight);
             time - secs_from_midnight
         }
 
@@ -40,7 +41,8 @@ pub mod worklog {
 
         pub fn add_entry_at(&self, date_str: &str) -> Result<(), ParseError> {
             let datetime = DateTime::parse_from_rfc3339(date_str)?;
-            let timestamp = datetime.timestamp() as u64;
+            let local_datetime = datetime.with_timezone(&Local);
+            let timestamp = local_datetime.timestamp() as u64;
             self.database_handler
                 .add_entry(self.get_midnight(timestamp), timestamp);
             Ok(())
@@ -54,7 +56,8 @@ pub mod worklog {
 
         pub fn add_exit_at(&self, date_str: &str) -> Result<(), ParseError> {
             let datetime = DateTime::parse_from_rfc3339(date_str)?;
-            let timestamp = datetime.timestamp() as u64;
+            let local_datetime = datetime.with_timezone(&Local);
+            let timestamp = local_datetime.timestamp() as u64;
             self.database_handler
                 .add_exit(self.get_midnight(timestamp), timestamp);
             Ok(())
@@ -62,6 +65,10 @@ pub mod worklog {
 
         pub fn print(&self) {
             self.database_handler.print();
+        }
+        pub fn plot(&self) {
+            let entries = self.database_handler.get_entry();
+            crate::plot::plot::plot_entries(entries);
         }
     }
 }
