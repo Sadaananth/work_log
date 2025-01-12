@@ -1,6 +1,6 @@
 pub mod plot {
     use crate::common::common::Entry;
-    use textplots::{Chart, Plot, Shape};
+    use textplots::{Chart, LabelBuilder, LabelFormat, Plot, Shape};
 
     use chrono::{DateTime, Local, TimeZone, Timelike};
 
@@ -10,7 +10,7 @@ pub mod plot {
     }
 
     pub fn plot_entries(entries: Vec<Entry>) {
-        let mut increment = 0.0;    
+        let mut increment = 0.0;
         let entry_data: Vec<(f32, f32)> = entries
             .iter()
             .filter_map(|value| {
@@ -24,25 +24,28 @@ pub mod plot {
             .collect();
         increment = 0.0;
         let exit_data: Vec<(f32, f32)> = entries
-        .iter()
-        .filter_map(|value: &Entry| {
-            to_hour_and_minute(value.exit).and_then(|(hour, minute)| {
-                let hour = hour as f32;
-                let minute = minute as f32 / 60.0;
-                increment += 1.0;
-                Some((increment, hour + minute))
+            .iter()
+            .filter_map(|value: &Entry| {
+                to_hour_and_minute(value.exit).and_then(|(hour, minute)| {
+                    let hour = hour as f32;
+                    let minute = minute as f32 / 60.0;
+                    increment += 1.0;
+                    Some((increment, hour + minute))
+                })
             })
-        })
-        .collect();
+            .collect();
 
         for val in &entry_data {
             println!("{:?}", val);
         }
         Chart::new(150, 40, 0.0, 5.0)
             .lineplot(&Shape::Steps(&entry_data))
-            .display();
+            .x_label_format(LabelFormat::Custom(Box::new(move |val| {
+                format!("{}", val as i64)
+            })))
+            .nice();
         Chart::new(150, 40, 0.0, 5.0)
-        .lineplot(&Shape::Steps(&exit_data))
-        .display();
+            .lineplot(&Shape::Steps(&exit_data))
+            .nice();
     }
 }

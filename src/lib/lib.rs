@@ -4,8 +4,8 @@ pub mod plot;
 
 pub mod worklog {
     use crate::database::database::DatabaseHandler;
-    use std::time::{SystemTime, UNIX_EPOCH};
     use chrono::{DateTime, Local, ParseError};
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     pub struct WorkLog {
         pub database_handler: DatabaseHandler,

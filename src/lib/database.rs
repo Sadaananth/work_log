@@ -2,6 +2,7 @@ pub mod database {
     use crate::common::common::Entry;
     use chrono::{TimeZone, Utc};
     use colour::*;
+    use dirs;
     use duckdb::{params, Connection};
 
     pub struct DatabaseHandler {
@@ -12,9 +13,12 @@ pub mod database {
         pub fn new(use_in_memory: bool) -> Self {
             DatabaseHandler {
                 conn: if use_in_memory {
-                    Connection::open_in_memory().expect("Failed to open connection to in memory database")
+                    Connection::open_in_memory()
+                        .expect("Failed to open connection to in memory database")
                 } else {
-                    Connection::open("worklog.db").expect("Failed to open connection to database")
+                    let home_dir = dirs::home_dir().expect("Failed to get home directory");
+                    let db_path = home_dir.join(".worklog.db");
+                    Connection::open(db_path).expect("Failed to open connection to database")
                 },
             }
         }
